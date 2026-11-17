@@ -1,2 +1,43 @@
 [gd_scene]
-[node name="RoomGrid" type="Node3D"]
+[subresources]
+[ext_resource path="res://scripts/game_manager.gd" type="Script" id=1]
+[ext_resource path="res://scenes/player/player_body.gd" type="Script" id=2]
+[ext_resource path="res://scenes/room/room_grid.gd" type="Script" id=3]
+[ext_resource path="res://scenes/gui/hud.gd" type="Script" id=4]
+
+[node name="MainScene" type="Node3D"]
+	@onready var player = $Player
+	@onready var room = $RoomGrid
+	@onready var hud = $HUD
+	@onready var game_manager = $GameManager
+
+	# Timer node for session time limit
+	Timer timer
+		timer.wait_time = 1.0
+		timer.one_shot = false
+		timer.timeout _on_session_timeout
+
+	# Player instance (instantiated from script)
+	Node3D player_instance
+		player_instance = Preload "res://scenes/player/player_body.gd".instance()
+
+	# Room instance (instantiated from script)
+	Node3D room_instance
+		room_instance = Preload "res://scenes/room/room_grid.gd".instance()
+
+	# HUD instance (instantiated from script)
+	Node3D hud_instance
+		hud_instance = Preload "res://scenes/gui/hud.gd".instance()
+
+	# Game Manager instance
+	Node3D game_manager_instance
+		game_manager_instance = Preload "res://scripts/game_manager.gd".instance()
+
+	# Signals
+	signal object_destroyed
+	signal session_timeout
+
+	# Connections (via _ready in script)
+	# room.connect("object_destroyed", game_manager, "add_currency")
+	# timer.timeout.connect(_on_session_timeout)
+	# player.connect("on_player_shoot", this, "on_player_shoot")

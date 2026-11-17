@@ -1,2 +1,124 @@
 [gd_scene]
+[subresources]
+[ext_resource path="res://scripts/game_manager.gd" type="Script" id=1]
+[ext_resource path="res://scenes/room/destructible_object_scene.gd" type="Script" id=2]
+[ext_resource path="res://assets/models/floor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/models/wall.tscn" type="PackedScene" id=4]
+
 [node name="RoomGrid" type="Node3D"]
+	@onready var game_manager: GameManager = null
+
+	# Floor generation
+	@onready var floor_instance = $Floor
+
+	# Wall instances (perimeter walls)
+	@onready var wall_instances: Array = $Walls
+
+	# Destructible objects
+	@onready var destructible_objects: Array = $Destructibles
+
+	# Grid reference
+	var grid_objects[12][12] = {}
+
+	func _ready():
+	    generate_room()
+	    if game_manager == null:
+	        var parent = get_parent()
+	        if parent and parent.is_class("GameManager"):
+	            game_manager = parent
+	    print("Room generated with " + str(count_objects()) + " destructible objects")
+
+	func set_game_manager(gm: GameManager):
+	    game_manager = gm
+
+	func generate_room():
+	    # Create floor grid (12x12 cells)
+	    for x in range(12):
+	        for z in range(12):
+            # Floor cell (using Y-up, so position at y=0)
+            if floor_instantiable:
+                var floor_instance = floor.tscn.instantiate()
+                floor_instance.position = Vector3(x * 2.0, 0, z * 2.0)
+                add_child(floor_instance)
+
+	    # Create perimeter walls
+	    for x in range(12):
+	        # Wall at x=0
+            if wall_instantiable:
+                var wall_instance = wall.tscn.instantiate()
+                wall_instance.position = Vector3(0, 1, x * 2.0)
+                add_child(wall_instance)
+
+                # Wall at x=11 (GRID_SIZE-1)
+                var wall_instance2 = wall.tscn.instantiate()
+                wall_instance2.position = Vector3((12-1) * 2.0, 1, x * 2.0)
+                add_child(wall_instance2)
+
+                # Wall at z=0
+                var wall_instance3 = wall.tscn.instantiate()
+                wall_instance3.position = Vector3(x * 2.0, 1, 0)
+                add_child(wall_instance3)
+
+                # Wall at z=11 (GRID_SIZE-1)
+                var wall_instance4 = wall.tscn.instantiate()
+                wall_instance4.position = Vector3(x * 2.0, 1, (12-1) * 2.0)
+                add_child(wall_instance4)
+
+	    # Place destructible objects randomly (up to 15)
+	    var placed = 0
+	    while placed < 15:
+	        var rand_x = randi() % 12
+	        var rand_z = randi() % 12
+
+	        if grid_objects[rand_x][rand_z] == null:
+	            var obj_type = pick_object_type()
+	            var obj_scene = preload("res://scenes/room/destructible_object_scene.gd")
+	            var obj_instance = obj_scene.instantiate()
+	            obj_instance.object_type = obj_type
+	            obj_instance.position = Vector3(rand_x * 2.0, 1, rand_z * 2.0)
+
+	            # Set hardness based on type
+	            var hardness_val = object_hardness[obj_type]
+	            obj_instance.set_hardness(hardness_val)
+
+	            # Set drop currency based on type
+	            var drop_amount = get_drop_currency(obj_type)
+	            obj_instance.drop_currency = drop_amount
+
+	            # Connect destroyed signal to game manager
+	            obj_instance.connect("destroyed", game_manager, "add_currency")
+
+	            add_child(obj_instance)
+
+	            # Store reference in grid
+	            grid_objects[rand_x][rand_z] = obj_instance
+
+	            placed += 1
+
+	func pick_object_type() -> String:
+	    var r = randf()
+	    if r < 0.5:
+	        return "crate"
+	    elif r < 0.75:
+	        return "barrel"
+	    elif r < 0.9:
+	        return "wooden_box"
+	    else:
+	        return "metal_crate"
+
+	func get_drop_currency(type: String) -> int:
+	    var drops = {"crate": 10, "barrel": 15, "wooden_box": 5, "metal_crate": 20}
+	    return drops.get(type, 10)
+
+	func count_objects() -> int:
+	    var count = 0
+	    for x in range(12):
+	        for z in range(12):
+	            if grid_objects[x][z] != null:
+	                count += 1
+	    return count
+
+	func _on_object_destroyed(drop_amount: int):
+	    if game_manager:
+	        game_manager.add_currency(drop_amount)
+	    print("Object destroyed! Drop: " + str(drop_amount) + " Total currency: " + str(game_manager.get_total_currency()))
