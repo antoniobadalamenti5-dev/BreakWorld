@@ -1,0 +1,5 @@
+- [production_report_final.md](production_report_final.md) — Complete production report with 4 required sections
+- [production_work_completed.md](production_work_completed.md) — Documentation of all completed work
+- [production_summary.md](production_summary.md) — Executive summary of project state
+- [timer_sync_fix.md](timer_sync_fix.md) — Timer desync fix documentation (removed independent HUD countdown, HUD now uses set_time_remaining from main_scene)
+- [code_audit_findings.md](code_audit_findings.md) — Code audit results: all core systems verified, dual-timer issue identified and fixed

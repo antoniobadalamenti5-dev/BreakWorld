@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackedScene3D>
+	<root3D>
+		<instance class_name="Node3D" name="main_scene">
+			<script>res://scenes/main_scene.gd</script>
+		</instance>
+	</root3D>
+</PackedScene3D>

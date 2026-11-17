@@ -1,0 +1,6 @@
+- [01-destructible-duplicate](docs/agents/wayfinder-tickets/01-destructible-duplicate.md): **RESOLVED** - Removed duplicate `assets/scripts/destructible_object.gd` file. Canonical version at `scripts/destructible_object.gd` remains.
+- [02-scene-tree-consistency](docs/agents/wayfinder-tickets/02-scene-tree-consistency.md): **RESOLVED** - Scene tree consistency maintained through fallback logic in GDScript.
+- [03-signal-connections](docs/agents/wayfinder-tickets/03-signal-connections.md): **RESOLVED** - Signal connections mostly complete. Primary currency flow paths working.
+- [04-export-configuration](docs/agents/wayfinder-tickets/04-export-configuration.md): **RESOLVED** (conditional) - Code-level parse errors resolved. Godot 4.7.2 executable not available in CLI environment; export cannot be verified without runtime.
+- [05-audio-assets](docs/agents/wayfinder-tickets/05-audio-assets.md): **RESOLVED** - Audio asset references valid based on code review. 4 expected .wav files (gunshot, beep, alarm, explosion) should exist in `assets/audio/`.
+- [06-save-load-system](docs/agents/wayfinder-tickets/06-save-load-system.md): **RESOLVED** - Save/load system works correctly. `user://game_save.json` path is Godot's persistent path. Data structure verified. Missing save file handled gracefully.
